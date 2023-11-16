@@ -3,13 +3,13 @@ package src.domain.useCases.items.synchronization.scraping;
 import src.domain.data.repositories.items.ScrapedItemsRepository;
 import src.domain.data.repositories.merchants.MerchantsFilter;
 import src.domain.data.repositories.merchants.MerchantsRepository;
+import src.domain.entities.Locator;
 import src.domain.entities.items.ScrapedItem;
 import src.domain.entities.items.exceptions.UnregisteredLocatorDomainException;
 import src.domain.entities.merchants.Merchant;
 import src.domain.useCases.items.synchronization.ItemScraper;
 
 import java.util.List;
-import java.util.UUID;
 
 public class NewItemScrapingService {
     private final MerchantsRepository merchantsRepository;
@@ -33,17 +33,14 @@ public class NewItemScrapingService {
         return scrapedItem.uuid.toString();
     }
 
-    public void ensureAllowedLocator(String locator) throws UnregisteredLocatorDomainException {
+    public void ensureAllowedLocator(String aLocator) throws UnregisteredLocatorDomainException {
+        Locator locator = new Locator(aLocator);
         MerchantsFilter merchantsFilter = new MerchantsFilter();
-        merchantsFilter.siteUrl = getDomain(locator);
+        merchantsFilter.siteUrl = locator.domain;
         List<Merchant> merchantList = merchantsRepository.filter(merchantsFilter, null);
 
         if (merchantList.isEmpty()) {
             throw new UnregisteredLocatorDomainException();
         }
-    }
-
-    public String getDomain(String locator) {
-        return "https://enter.online/";
     }
 }
